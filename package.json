@@ -18,6 +18,9 @@
   "homepage": "https://github.com/exsmiley/counterpoint#readme",
   "dependencies": {
     "express": "^4.13.3",
-    "mongoose": "^4.2.7"
+    "mongoose": "^4.2.7",
+    "python-shell": "^0.3.0",
+    "vexflow": "^1.2.41",
+    "vextab": "^2.0.11"
   }
 }
