@@ -1,0 +1,23 @@
+{
+  "name": "counterpoint",
+  "version": "1.0.0",
+  "description": "make counterpoint automatically!",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/exsmiley/counterpoint.git"
+  },
+  "author": "exsmiley",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/exsmiley/counterpoint/issues"
+  },
+  "homepage": "https://github.com/exsmiley/counterpoint#readme",
+  "dependencies": {
+    "express": "^4.13.3",
+    "mongoose": "^4.2.7"
+  }
+}

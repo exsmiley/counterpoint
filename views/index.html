@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- CSS -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" />
+  	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" />
+
+	<!-- Scripts -->
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.js"></script>
+	<script src="main.js"></script>
+	<script src="controllers/mainController.js"></script>
+	<script src="controllers/homeController.js"></script>
+	<script src="directives/homeDirective.js"></script>
+	<script src="directives/navbarDirective.js"></script>
+
+	<!-- Let's it have a pretty url -->
+  	<base href="/">
+</head>
+
+<body ng-app="counterpoint" ng-controller="mainController">
+	<navbar></navbar>
+	{{bob}}
+	<div id="main">
+    	<!-- angular templating -->
+		<!-- this is where content will be injected -->
+    	<div ng-view></div>
+    </div>
+</body>
+
+
+</html>
