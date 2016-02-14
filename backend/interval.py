@@ -40,8 +40,3 @@ def findQuality(note1, note2):
 
 def findInterval(note1, note2):
 	return findQuality(note1, note2) + str(findIntervalSize(note1, note2))
-
-# some tests
-print findInterval('B', 'C') == 'm2'
-print findInterval('D#', 'G') == 'd4'
-print findInterval('C', 'B') == 'M7'
