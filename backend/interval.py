@@ -1,11 +1,12 @@
-semitones = {"C": 0, "C#": 1, "Db" : 1, "D": 2, "D#": 3, "Eb": 3, "E": 4, "F": 5, "F#": 6, "Gb" : 6, 
-				"G": 7, "G#": 8, "Ab": 8, "A": 9, "A#": 10, "Bb": 10, "B": 11}
+semitones = {"C": 0, "C#": 1, "Db" : 1, "D": 2, "D#": 3, "Eb": 3, "E": 4, "Fb":4, "E#":5, "F": 5, "F#": 6, "Gb" : 6, 
+				"G": 7, "G#": 8, "Ab": 8, "A": 9, "A#": 10, "Bb": 10, "B": 11, 'Cb':11, 'B#':0}
 
-intervalMap = {0: "P1", 1: "m2", 2: "M2", 3: "m3", 4: "M3", 5: "P4", 6: "A4", 7:"P5", 8:"m6", 9:"M6", 10:"m7", 11:"M7"}
+intervalMap = {0: "P8", 1: "m2", 2: "M2", 3: "m3", 4: "M3", 5: "P4", 6: "A4", 7:"P5", 8:"m6", 9:"M6", 10:"m7", 11:"M7"}
 
-# todo make it handle even more notes ie. B#
+# TODO make it handle even more notes ie. B#
 
-# return type = int
+# Finds the size of the interval between two note but ignores the enharmonic equivalents
+# @return int representing the size of the interval
 def findIntervalSize(note1, note2):
 	return int(intervalMap[(semitones[note2[0]] - semitones[note1[0]]) % 12][1])
 
@@ -35,7 +36,7 @@ def findQuality(note1, note2):
 			return "A"
 	else:
 		# no idea what could make it get to here...
-		return None
+		return "fail"
 
 
 def findInterval(note1, note2):
