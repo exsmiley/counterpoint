@@ -6,6 +6,11 @@ intervalMap = {0: "P8", 1: "m2", 2: "M2", 3: "m3", 4: "M3", 5: "P4", 6: "A4", 7:
 # Finds the size of the interval between two note but ignores the enharmonic equivalents
 # @return int representing the size of the interval
 def findIntervalSize(note1, note2):
+	# weird edge case when the notes are B and F
+	if note1[0] == 'B' and note2[0] == 'F':
+		return 5
+	if note1[0] == 'F' and note2[0] == 'B':
+		return 3
 	return int(intervalMap[(semitones[note2[0]] - semitones[note1[0]]) % 12][1])
 
 def fixQuality(intervalSize, wrongQuality, delta):
@@ -30,8 +35,12 @@ def findQuality(note1, note2):
 	intervalSize = findIntervalSize(note1, note2)
 	# what the interval sounds like regardless of its formal name
 	soundsLike = intervalMap[(semitones[note2[0]] - semitones[note1[0]]) % 12]
-	otherInterval = int(soundsLike[1])
 	wrongQuality = soundsLike[0]
+	# weird edge case when the notes are B and F
+	if note1[0] == 'B' and note2[0] == 'F':
+		wrongQuality = 'd'
+	if note1[0] == 'F' and note2[0] == 'B':
+		wrongQuality = 'A'
 	delta = 0
 	if len(note1) > 1:
 		if note1[1] == '#':
