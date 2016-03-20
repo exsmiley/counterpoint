@@ -129,18 +129,52 @@ for note in semitones.keys():
 	if note.find('b') == -1 and note != "E#" and note != "B#":
 		reverseSemitoneFinder[semitones[note]] = note
 
+# Finds the enharmonic equivalent of this note
+# @param note:str the name of a note
+# @param up:int the direction of the letter name you want to switch
+# @return str the note that is the enharmonic equivalent of this note
+def enharmonicSwitch(note, up):
+	names = ["C", "D", "E", "F", "G", "A", "B"]
+	noteIndex = 0
+	for i in range(len(names)):
+		if names[i] == note[0]:
+			noteIndex = i
+	otherNote = names[(noteIndex + up) % 7]
+	# use relative positions to find the equivalent enharmonic name
+	position = semitones[note[0]]
+	# add sharps/flats
+	for i in range(len(note)):
+		if note[i] == "#":
+			position += 1
+		elif note[i] == "b":
+			position -= 1
+	# deal with wrapping around in semitones
+	if noteIndex + up != (noteIndex + up) % 7:
+		position -= 12
+
+	otherNotePosition = semitones[otherNote]
+	change = position - otherNotePosition
+	# now add sharps and flats as needed to otherNote
+	if change > 0:
+		for i in range(change):
+			otherNote += "#"
+	else:
+		for i in range(-change):
+			otherNote += "b"
+
+	return otherNote
+
 # Finds the note above that is the given interval away
 # @param note:str the name of a note2
 # @param interval:str the name of an interval (ie. d7, m2, M3, P5, A4, etc.)
 # @return str the name of a note that is the specified interval away
 def findNoteFromInterval(note, interval):
 	distance = semitoneDistanceFromInterval(interval)
-	return NotImplemented
+	initialPosition = semitones[note]
+	otherNote = reverseSemitoneFinder[(initialPosition + distance) % 12]
+	return otherNote
 
-
-
-
-
+	
 
 
 
