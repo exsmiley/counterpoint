@@ -166,11 +166,17 @@ def enharmonicSwitch(note, up):
 
 # Finds the note above that is the given interval away
 # @param note:str the name of a note2
-# @param interval:str the name of an interval (ie. d7, m2, M3, P5, A4, etc.)
+# @param interval:str the name of an interval (ie. d7, m2, M3, P5, A4, etc.) up to 8ths
 # @return str the name of a note that is the specified interval away
 def findNoteFromInterval(note, interval):
 	distance = semitoneDistanceFromInterval(interval)
-	initialPosition = semitones[note]
+	initialPosition = semitones[note[0]]
+	# add sharps/flats
+	for i in range(len(note)):
+		if note[i] == "#":
+			initialPosition += 1
+		elif note[i] == "b":
+			initialPosition -= 1
 	otherNote = reverseSemitoneFinder[(initialPosition + distance) % 12]
 	currentInterval = findInterval(note, otherNote)
 	enharmonicChange = (int(interval[len(interval)-1]) - int(currentInterval[len(currentInterval)-1])) % 7
