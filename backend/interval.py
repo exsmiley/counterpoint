@@ -3,15 +3,6 @@ semitones = {"C": 0, "C#": 1, "Db" : 1, "D": 2, "D#": 3, "Eb": 3, "E": 4, "Fb":4
 
 intervalMap = {0: "P8", 1: "m2", 2: "M2", 3: "m3", 4: "M3", 5: "P4", 6: "A4", 7:"P5", 8:"m6", 9:"M6", 10:"m7", 11:"M7"}
 
-distanceBetweenIntervals = {} # an inverse version of intervalMap
-
-# invert the intervalMap
-for distance in intervalMap.keys():
-	distanceBetweenIntervals[intervalMap[distance]] = distance
-
-# missing the case of a unison
-distanceBetweenIntervals["P1"] = 0
-
 # Finds the size of the interval between two note but ignores the enharmonic equivalents
 # @param note1:str the name of a note
 # @param note2:str the name of a note
@@ -83,5 +74,78 @@ def findQuality(note1, note2):
 # @return str the quality of the interval between the two notes and the size (ie. d7, m2, M3, P5, A4, etc.)
 def findInterval(note1, note2):
 	if not findQuality(note1, note2):
-		return "bob"
+		return "cannot find the interval between these 2 notes"
 	return findQuality(note1, note2) + str(findIntervalSize(note1, note2))
+
+# data structure to known the semitone distance from tonic for a specified interval
+distanceBetweenIntervals = {}
+
+# invert the intervalMap
+for distance in intervalMap.keys():
+	distanceBetweenIntervals[intervalMap[distance]] = distance
+
+# missing the case of a unison
+distanceBetweenIntervals["P1"] = 0
+# P8 is incorrect
+distanceBetweenIntervals["P8"] = 12
+
+# Finds the semitone distance of a specified interval
+# @param interval:str the name of an interval (ie. d7, m2, M3, P5, A4, etc.)
+# @return int the semitone distance between notes with that interval
+def semitoneDistanceFromInterval(interval):
+	distance = 0
+	# handle intervals that were perfect
+	if interval[len(interval)-1] == '4' or interval[len(interval)-1] == '5' or interval[len(interval)-1] == '8' or interval[len(interval)-1] == '1':
+		distance = distanceBetweenIntervals['P' + interval[len(interval)-1]]
+		if interval.find('d') > -1:
+			return distance - len(interval) + 1 # scales with the number of diminisheds
+		elif interval.find('A') > -1:
+			return distance + len(interval) - 1 # scales with the number of augmenteds
+		# that means it's perfect!
+		else:
+			return distance
+
+	else:
+		# minor/diminished handling
+		if interval.find("m") > -1 or interval.find("d") > -1:
+			distance = distanceBetweenIntervals['m' + interval[len(interval)-1]]
+			if interval.find('d') > -1:
+				return distance - len(interval) + 1 # scales with the number of diminisheds
+			# that means it's minor!
+			else:
+				return distance
+		# major/augmented handling
+		else:
+			distance = distanceBetweenIntervals['M' + interval[len(interval)-1]]
+			if interval.find('A') > -1:
+				return distance + len(interval) - 1 # scales with the number of augmenteds
+			# that means it's minor!
+			else:
+				return distance
+
+# data structure to allow us to find the relation between notes via semitones
+reverseSemitoneFinder = {}
+for note in semitones.keys():
+	if note.find('b') == -1 and note != "E#" and note != "B#":
+		reverseSemitoneFinder[semitones[note]] = note
+
+# Finds the note above that is the given interval away
+# @param note:str the name of a note2
+# @param interval:str the name of an interval (ie. d7, m2, M3, P5, A4, etc.)
+# @return str the name of a note that is the specified interval away
+def findNoteFromInterval(note, interval):
+	distance = semitoneDistanceFromInterval(interval)
+	return NotImplemented
+
+
+
+
+
+
+
+
+
+
+
+
+
