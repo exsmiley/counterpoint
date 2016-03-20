@@ -1,4 +1,4 @@
-from interval import findInterval, semitoneDistanceFromInterval, enharmonicSwitch
+from interval import findInterval, semitoneDistanceFromInterval, enharmonicSwitch, findNoteFromInterval
 
 print "Testing methods in interval..."
 passed = True
@@ -49,7 +49,7 @@ else:
 for fail in failed:
 	print fail
 
-# tests for findInterval (integration test)
+# tests for enharmonicSwitch
 tests = {('B', 1):'Cb', ("C#", 1): "Db", ("E", 1): "Fb", ("G", -1): "F##", ("A#", 1): "Bb", ("Bb", -1): "A#"}
 failed = []
 
@@ -63,6 +63,24 @@ if len(failed) == 0:
 else:
 	passed = False
 	print "Failed a total of " + str(len(failed)) + " tests for enharmonicSwitch."
+
+for fail in failed:
+	print fail
+
+# tests for findNoteFromInterval
+tests = {('B', "m2"):'C', ("G#", "P5"): "D#", ("E", "m3"): "G", ("G", "m7"): "F", ("A#", "P4"): "D#", ("Bb", "M6"): "G"}
+failed = []
+
+for test in tests.keys():
+	testValue = findNoteFromInterval(test[0], test[1])
+	if testValue != tests[test]:
+		failed.append("Failed " + str(test) + ". Expected: " + tests[test] + " but got " + testValue)
+
+if len(failed) == 0:
+	print "Passed all " + str(len(tests.keys())) + " tests for findNoteFromInterval."
+else:
+	passed = False
+	print "Failed a total of " + str(len(failed)) + " tests for findNoteFromInterval."
 
 for fail in failed:
 	print fail

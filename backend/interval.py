@@ -172,14 +172,6 @@ def findNoteFromInterval(note, interval):
 	distance = semitoneDistanceFromInterval(interval)
 	initialPosition = semitones[note]
 	otherNote = reverseSemitoneFinder[(initialPosition + distance) % 12]
-	return otherNote
-
-	
-
-
-
-
-
-
-
-
+	currentInterval = findInterval(note, otherNote)
+	enharmonicChange = (int(interval[len(interval)-1]) - int(currentInterval[len(currentInterval)-1])) % 7
+	return enharmonicSwitch(otherNote, enharmonicChange)
