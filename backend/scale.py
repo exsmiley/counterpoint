@@ -1,4 +1,4 @@
-from interval import findNoteFromInterval
+from interval import findNoteFromInterval, enharmonicSwitch
 
 # Gives a major scale based on the specified note
 # @param note:str the name of a note
@@ -62,4 +62,57 @@ def bluesScale(note):
 	notes.append(findNoteFromInterval(notes[len(notes)-1], "m2"))
 	notes.append(findNoteFromInterval(notes[len(notes)-1], "A1"))
 	notes.append(findNoteFromInterval(notes[len(notes)-1], "m3"))
+	return notes
+
+# Gives a Phrygian Dominant scale based on the specified note
+# @param note:str the name of a note
+# @return list<str> a list of notes that makes up the Phrygian Dominant scale of note 
+def phrygianDominantScale(note):
+	notes = [note]
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "m2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "A2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "m2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "M2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "m2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "M2"))
+	return notes
+
+# Gives a lydian scale based on the specified note
+# @param note:str the name of a note
+# @return list<str> a list of notes that makes up the lydian scale of note 
+def lydianScale(note):
+	notes = [note]
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "M2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "M2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "M2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "m2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "M2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "M2"))
+	return notes
+
+# Gives a Hungarian minor scale based on the specified note
+# @param note:str the name of a note
+# @return list<str> a list of notes that makes up the Hungarian minor scale of note 
+def hungarianMinorScale(note):
+	notes = [note]
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "M2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "m2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "A2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "m2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "m2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "A2"))
+	return notes
+
+# Gives a diminished scale based on the specified note
+# @param note:str the name of a note
+# @return list<str> a list of notes that makes up the diminished scale of note 
+def diminishedScale(note):
+	notes = [note]
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "m2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "M2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-2], "A2"))
+	notes.append(enharmonicSwitch(findNoteFromInterval(notes[len(notes)-1], "M2"), 1))
+	notes.append(findNoteFromInterval(enharmonicSwitch(notes[len(notes)-1], -1), "m2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "M2"))
+	notes.append(findNoteFromInterval(notes[len(notes)-1], "m2"))
 	return notes
