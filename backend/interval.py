@@ -13,6 +13,8 @@ def findIntervalSize(note1, note2):
 		return 5
 	if note1[0] == 'F' and note2[0] == 'B':
 		return 4
+	if note1[0] == note2[0] and note1[len(note1)-1] == note2[len(note2)-1]:
+		return 1
 	return int(intervalMap[(semitones[note2[0]] - semitones[note1[0]]) % 12][1])
 
 # Finds the correct quality of the interval based on the interval size, previously wrong quality,
@@ -23,7 +25,7 @@ def findIntervalSize(note1, note2):
 # @return str the correct quality for this interval
 def fixQuality(intervalSize, wrongQuality, delta):
 	quality = "wrong"
-	if intervalSize == 4 or intervalSize == 5 or intervalSize == 8:
+	if intervalSize in [1, 4, 5, 8]:
 		if wrongQuality == 'M':
 			wrongQuality = 'P'
 		elif wrongQuality == 'm':
