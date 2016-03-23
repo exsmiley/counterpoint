@@ -12,7 +12,7 @@ def findIntervalSize(note1, note2):
 	if note1[0] == 'B' and note2[0] == 'F':
 		return 5
 	if note1[0] == 'F' and note2[0] == 'B':
-		return 3
+		return 4
 	return int(intervalMap[(semitones[note2[0]] - semitones[note1[0]]) % 12][1])
 
 # Finds the correct quality of the interval based on the interval size, previously wrong quality,
@@ -69,13 +69,27 @@ def findQuality(note1, note2):
 	return fixQuality(intervalSize, wrongQuality, delta)
 
 # Finds the size and quality of the interval between note1 and note2
-# @param note1:str the name of a note
-# @param note2:str the name of a note
+# @param note1:str the name of a note and the number of its octave
+# @param note2:str the name of a note and the number of its octave
 # @return str the quality of the interval between the two notes and the size (ie. d7, m2, M3, P5, A4, etc.)
 def findInterval(note1, note2):
-	if not findQuality(note1, note2):
-		return "cannot find the interval between these 2 notes"
-	return findQuality(note1, note2) + str(findIntervalSize(note1, note2))
+	if not isFirstNoteHigher(note1, note2):
+		return findQuality(note2, note1) + str(findIntervalSize(note2, note1))
+	else:
+		return findQuality(note1, note2) + str(findIntervalSize(note1, note2))
+
+# Determines if the pitch of the first note is higher than the second note
+# @param note1:str the name of a note and the number of its octave
+# @param note2:str the name of a note and the number of its octave
+# @return bool true if the first note is higher, otherwise false
+def isFirstNoteHigher(note1, note2):
+	note1num = int(note1[len(note1)-1])
+	note2num = int(note2[len(note2)-1])
+	name1 = note1[:len(note1)-1]
+	name2 = note2[:len(note2)-1]
+	# conditional: assumes that you are not comparing double sharps/flats or more...
+	return note1num < note2num or (semitones[name1[:2]] <= semitones[name2[:2]] and note1num == note2num)
+
 
 # data structure to known the semitone distance from tonic for a specified interval
 distanceBetweenIntervals = {}
@@ -149,9 +163,10 @@ def enharmonicSwitch(note, up):
 		elif note[i] == "b":
 			position -= 1
 	# deal with wrapping around in semitones
-	if noteIndex + up != (noteIndex + up) % 7:
+	if noteIndex + up != (noteIndex + up) % 7 and (noteIndex + up) > 0:
 		position -= 12
-
+	elif noteIndex + up != (noteIndex + up) % 7 and (noteIndex + up) < 0:
+		position += 12
 	otherNotePosition = semitones[otherNote]
 	change = position - otherNotePosition
 	# now add sharps and flats as needed to otherNote
@@ -165,19 +180,24 @@ def enharmonicSwitch(note, up):
 	return otherNote
 
 # Finds the note above that is the given interval away
-# @param note:str the name of a note2
+# @param note:str the name of a note and the number of its octave
 # @param interval:str the name of an interval (ie. d7, m2, M3, P5, A4, etc.) up to 8ths
 # @return str the name of a note that is the specified interval away
 def findNoteFromInterval(note, interval):
 	distance = semitoneDistanceFromInterval(interval)
 	initialPosition = semitones[note[0]]
 	# add sharps/flats
-	for i in range(len(note)):
+	for i in range(len(note)-1):
 		if note[i] == "#":
 			initialPosition += 1
 		elif note[i] == "b":
 			initialPosition -= 1
 	otherNote = reverseSemitoneFinder[(initialPosition + distance) % 12]
+	if (initialPosition + distance) % 12 == initialPosition + distance:
+		otherNote += note[len(note)-1]
+	else:
+		otherNote += str(int(note[len(note)-1])+1)
 	currentInterval = findInterval(note, otherNote)
-	enharmonicChange = (int(interval[len(interval)-1]) - int(currentInterval[len(currentInterval)-1])) % 7
-	return enharmonicSwitch(otherNote, enharmonicChange)
+	# make sure the note is the harmonic note that it is supposed to be
+	enharmonicChange = (int(interval[len(interval)-1]) - int(currentInterval[len(currentInterval)-1])) 
+	return enharmonicSwitch(otherNote[:-1], enharmonicChange) + otherNote[len(otherNote)-1]
