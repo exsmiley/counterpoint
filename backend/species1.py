@@ -53,11 +53,11 @@ def checkFirstSpeciesRules(cf, counter): # TODO, check for crossing
 
 	# check start
 	if not verticalIntervals[0] in ["M3", "P1", "P5", "P8"]:
-		errors.append("Incorrect start of a " + verticalIntervals[0])
+		errors.append("Incorrect start of a " + verticalIntervals[0] + " at position 0")
 
 	# check end
 	if not verticalIntervals[len(verticalIntervals)-1] in ["P1", "P8"]:
-		errors.append("Incorrect ending of a " + verticalIntervals[len(verticalIntervals)-1])
+		errors.append("Incorrect ending of a " + verticalIntervals[len(verticalIntervals)-1] + " at position " + str(len(counter)-1))
 
 	correct = len(errors) == 0
 	return correct, errors
@@ -99,10 +99,46 @@ def recursiveAddFirstSpecies(cf, cfInd, counter, possible):
 			allTries += recursiveAddFirstSpecies(cf, cfInd+1, counterTry, possible)
 		return allTries
 
+def randomFirstSpecies(cf, scale_type="major"):
+	scale = majorScale(cf[len(cf)-1]) # get possible notes that can be used
+	possible = []
+	# put notes an octave higher for less chance of crossing over
+	for note in scale:
+		possible.append(note[:-1] + str(int(note[-1]) + 1))
+
+	goodHorizontalIntervals = ["m2", "M2", "m3", "M3", "P4", "P5", "m6", "M6", "P8"]
+	goodVerticalIntervals = ["P1", "m3", "M3", "P5", "m6", "M6", "P8"]
+
+	# make a probably wrong counterpoint
+	counter = [possible[int(math.floor(random.random()*len(possible)))] for i in range(len(cf))]
+	counter[-1] = findNoteFromInterval(cf[-1], "P8")
+
+	correct, errors = checkFirstSpeciesRules(cf, counter)
+	i = 1
+
+	while not correct:
+		#print counter
+		#print len(errors)
+		fix = int(math.floor(random.random()*len(errors)))
+		indToFix = int(errors[fix][-1])
+		#print errors[fix], errors[fix][-1]
+		# only fix one error at a time
+		if indToFix > 0 and int(math.floor(random.random()*len(errors))) == 0:
+			indToFix -= int(math.floor(random.random()*(len(counter))))
+		
+		if indToFix == len(counter) - 1:
+			indToFix -= 1
+		counter[indToFix] = possible[int(math.floor(random.random()*len(possible)))]
+		correct, errors = checkFirstSpeciesRules(cf, counter)
+		i += 1
+		if i == 10000:
+			correct = True
+	print i, errors
+	return counter
+
+
 
 
 cf = ["C2", "D2", "E2", "A2", "F2", "E2", "F2", "D2", "D2", "C2"]
 
-
-print bruteForceFirstSpecies(cf)
-
+print randomFirstSpecies(cf)
