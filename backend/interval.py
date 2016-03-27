@@ -75,7 +75,7 @@ def findQuality(note1, note2):
 # @param note2:str the name of a note and the number of its octave
 # @return str the quality of the interval between the two notes and the size (ie. d7, m2, M3, P5, A4, etc.)
 def findInterval(note1, note2):
-	if not isFirstNoteHigher(note1, note2):
+	if isFirstNoteHigher(note1, note2):
 		return findQuality(note2, note1) + str(findIntervalSize(note2, note1))
 	else:
 		return findQuality(note1, note2) + str(findIntervalSize(note1, note2))
@@ -90,7 +90,7 @@ def isFirstNoteHigher(note1, note2):
 	name1 = note1[:len(note1)-1]
 	name2 = note2[:len(note2)-1]
 	# conditional: assumes that you are not comparing double sharps/flats or more...
-	return note1num < note2num or (semitones[name1[:2]] <= semitones[name2[:2]] and note1num == note2num)
+	return note1num > note2num or (semitones[name1[:2]] >= semitones[name2[:2]] and note1num == note2num)
 
 
 # data structure to known the semitone distance from tonic for a specified interval
