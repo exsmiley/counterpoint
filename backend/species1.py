@@ -19,7 +19,7 @@ def checkContrary(cf1, cf2, counter1, counter2):
 # @param counter:list<str> the counterpoint, a list of notes
 # @return (boolean, list<str) True if all of the rules are followed, incidents
 # 	where the rules are broken
-def checkFirstSpeciesRules(cf, counter): # TODO, check for crossing
+def checkFirstSpeciesRules(cf, counter):
 	errors = []
 	verticalIntervals = []
 
@@ -62,12 +62,11 @@ def checkFirstSpeciesRules(cf, counter): # TODO, check for crossing
 	correct = len(errors) == 0
 	return correct, errors
 
-# Create a first species counterpoint by brute force (exponential worst case running time)
-# @param cf:list<str> the cantus firmus, a list of notes, assumes key is based off of last note
-# @param scale:str the type of scale to use
-# @return (boolean, list<str) True if all of the rules are followed, incidents
-# 	where the rules are broken
-def bruteForceFirstSpecies(cf, scale_type="major"):
+# Creates a counterpoint according to the rules of First Species Counterpoint
+# @param cf:list<str> the cantus firmus, a list of notes
+# @param scale_type:str the type of scale that is to be used to make the counterpoint
+# @return list<str> a list of notes to satisfy counterpoint, otherwise None
+def findFirstSpecies(cf, scale_type="major"):
 	scale = majorScale(cf[len(cf)-1]) # get possible notes that can be used
 	possible = []
 	# put notes an octave higher for less chance of crossing over
@@ -77,68 +76,39 @@ def bruteForceFirstSpecies(cf, scale_type="major"):
 	goodHorizontalIntervals = ["m2", "M2", "m3", "M3", "P4", "P5", "m6", "M6", "P8"]
 	goodVerticalIntervals = ["P1", "m3", "M3", "P5", "m6", "M6", "P8"]
 
-	allPossible = recursiveAddFirstSpecies(cf, 0, [], possible)
-	print allPossible
+	counter = [{"possible": [] + possible, "chosen": None} for i in range(len(cf))]
 
-	# need helper function to recursively add notes
-	return allPossible[int(math.floor(random.random()*len(allPossible)))+1]
+	# first handle beginning
+	for i in range(len(counter[0]["possible"])):
+		note = counter[0]["possible"][i]
+		verticalInterval = findInterval(cf[0], note)
+		if verticalInterval not in ["M3", "P1", "P5", "P8"]:
+			counter[0]["possible"][i] = None
+	# get rid of impossible notes
+	counter[0]["possible"] = [note for note in counter[0]["possible"] if note]
 
-def recursiveAddFirstSpecies(cf, cfInd, counter, possible):
-	allTries = []
-	# last call to it
-	if cfInd == len(cf)-1:
-		for note in possible:
-			counterTry = counter + [note]
-			if checkFirstSpeciesRules(counterTry, cf)[0]:
-				allTries.append(counterTry)
-		return allTries
-	else:
-		# recursively try all of them
-		for note in possible:
-			counterTry = counter + [note]
-			allTries += recursiveAddFirstSpecies(cf, cfInd+1, counterTry, possible)
-		return allTries
+	if len(counter[0]["possible"]) == 0:
+		return None
+	counter[0]["chosen"] = counter[0]["possible"][int(math.floor(random.random()*len(counter[0]["possible"])))]
+	
+	# now handle ending
+	for i in range(len(counter[len(counter)-1]["possible"])):
+		note = counter[len(counter)-1]["possible"][i]
+		verticalInterval = findInterval(cf[0], note)
+		if verticalInterval not in ["P1", "P8"]:
+			counter[len(counter)-1]["possible"][i] = None
 
-def randomFirstSpecies(cf, scale_type="major"):
-	scale = majorScale(cf[len(cf)-1]) # get possible notes that can be used
-	possible = []
-	# put notes an octave higher for less chance of crossing over
-	for note in scale:
-		possible.append(note[:-1] + str(int(note[-1]) + 1))
+	counter[len(counter)-1]["possible"] = [note for note in counter[len(counter)-1]["possible"] if note]
+	if len(counter[len(counter)-1]["possible"]) == 0:
+		return None
+	counter[len(counter)-1]["chosen"] = counter[len(counter)-1]["possible"][int(math.floor(random.random()*len(counter[len(counter)-1]["possible"])))]
 
-	goodHorizontalIntervals = ["m2", "M2", "m3", "M3", "P4", "P5", "m6", "M6", "P8"]
-	goodVerticalIntervals = ["P1", "m3", "M3", "P5", "m6", "M6", "P8"]
-
-	# make a probably wrong counterpoint
-	counter = [possible[int(math.floor(random.random()*len(possible)))] for i in range(len(cf))]
-	counter[-1] = findNoteFromInterval(cf[-1], "P8")
-
-	correct, errors = checkFirstSpeciesRules(cf, counter)
-	i = 1
-
-	while not correct:
-		#print counter
-		#print len(errors)
-		fix = int(math.floor(random.random()*len(errors)))
-		indToFix = int(errors[fix][-1])
-		#print errors[fix], errors[fix][-1]
-		# only fix one error at a time
-		if indToFix > 0 and int(math.floor(random.random()*len(errors))) == 0:
-			indToFix -= int(math.floor(random.random()*(len(counter))))
-		
-		if indToFix == len(counter) - 1:
-			indToFix -= 1
-		counter[indToFix] = possible[int(math.floor(random.random()*len(possible)))]
-		correct, errors = checkFirstSpeciesRules(cf, counter)
-		i += 1
-		if i == 10000:
-			correct = True
-	print i, errors
 	return counter
+
 
 
 
 
 cf = ["C2", "D2", "E2", "A2", "F2", "E2", "F2", "D2", "D2", "C2"]
 
-print randomFirstSpecies(cf)
+print findFirstSpecies(cf)

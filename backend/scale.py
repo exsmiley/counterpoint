@@ -144,3 +144,4 @@ def diminishedScale(note):
 	notes.append(findNoteFromInterval(notes[len(notes)-1], "m2"))
 	return notes
 
+print majorScale('G3')
