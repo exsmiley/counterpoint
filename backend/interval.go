@@ -76,6 +76,11 @@ func fixQuality(intervalSize int, wrongQuality string, delta int) string {
 		}
 		qualities := []string{"dd", "d", "P", "A","AA",}
 		index := indexInArray(qualities, wrongQuality) + delta
+		if index < 0 {
+			index = (index % len(qualities)) + len(qualities)
+		} else if index > len(qualities) - 1 {
+			index = index % len(qualities)
+		}
 		fmt.Println(index)
 		quality = string(qualities[index])
 	default:
@@ -84,6 +89,11 @@ func fixQuality(intervalSize int, wrongQuality string, delta int) string {
 		}
 		qualities := []string{"dd", "d", "m", "M", "A","AA"}
 		index := indexInArray(qualities, wrongQuality) + delta
+		if index < 0 {
+			index = (index % len(qualities)) + len(qualities)
+		} else if index > len(qualities) - 1 {
+			index = index % len(qualities)
+		}
 		fmt.Println(index)
 		quality = string(qualities[index])
 	}
@@ -97,19 +107,26 @@ func fixQuality(intervalSize int, wrongQuality string, delta int) string {
 func findQuality(note1 string, note2 string) string {
 	intervalSize := findIntervalSize(note1, note2)
 
+	name1 := note1[:len(note1)-1]
+	name2 := note2[:len(note2)-1]
 	// what the interval sounds like regardless of its formal name
-	soundsLike := intervalMap[((semitones[note2[0:1]] - semitones[note1[0:1]] % 12) + 12) % 12]
+	soundsLike := intervalMap[((semitones[name2] - semitones[name1] % 12) + 12) % 12]
 	wrongQuality := soundsLike[0:1]
 
-	delta := 0
+	val, _ := strconv.Atoi(soundsLike[1:2])
 
-	if len(note1) > 1 {
+	delta := val - intervalSize
+
+	if intervalSize == 1 && val == 8 {
+		delta = 0
+	}
+
+	if name1[:1] == name2[:1] && wrongQuality != "P" {
 		if note1[1:2] == "#" {
 			delta -= 1
 		} else if note1[1:2] == "b" {
 			delta += 1
 		}
-	} else if len(note2) > 1 {
 		if note2[1:2] == "#" {
 			delta -= 1
 		} else if note2[1:2] == "b" {
@@ -117,11 +134,26 @@ func findQuality(note1 string, note2 string) string {
 		}
 	}
 
+	// if len(note1) > 1 {
+	// 	if note1[1:2] == "#" {
+	// 		delta -= 1
+	// 	} else if note1[1:2] == "b" {
+	// 		delta += 1
+	// 	}
+	// } else if len(note2) > 1 {
+	// 	if note2[1:2] == "#" {
+	// 		delta -= 1
+	// 	} else if note2[1:2] == "b" {
+	// 		delta += 1
+	// 	}
+	// }
+
 	if delta >= 12 || delta <= -12 {
 		delta = ((delta % 12) + 12) % 12
 	}
 	fmt.Println(intervalSize)
-	fmt.Println(wrongQuality)
+	fmt.Println(soundsLike)
+	fmt.Println("meep")
 	fmt.Println(delta)
 	return fixQuality(intervalSize, wrongQuality, delta)
 }
