@@ -69,32 +69,36 @@ func fixQuality(intervalSize int, wrongQuality string, delta int) string {
 	quality := "wrong"
 	switch intervalSize {
 	case 1,4,5,8:
-		if wrongQuality == "M" {
+		if wrongQuality == "M" || wrongQuality == "m"{
 			wrongQuality = "P"
-		} else if wrongQuality == "m" {
-			wrongQuality = "d"
-		}
+		} 
+
 		qualities := []string{"dd", "d", "P", "A","AA",}
 		index := indexInArray(qualities, wrongQuality) + delta
+
 		if index < 0 {
 			index = (index % len(qualities)) + len(qualities)
 		} else if index > len(qualities) - 1 {
 			index = index % len(qualities)
 		}
-		fmt.Println(index)
+		
 		quality = string(qualities[index])
 	default:
-		if wrongQuality == "P" {
+		if wrongQuality == "P" && delta >= 0{
 			wrongQuality = "M"
+		} else if wrongQuality == "P" {
+			wrongQuality = "m"
 		}
+
 		qualities := []string{"dd", "d", "m", "M", "A","AA"}
 		index := indexInArray(qualities, wrongQuality) + delta
+
 		if index < 0 {
 			index = (index % len(qualities)) + len(qualities)
 		} else if index > len(qualities) - 1 {
 			index = index % len(qualities)
 		}
-		fmt.Println(index)
+
 		quality = string(qualities[index])
 	}
 	return quality
@@ -122,39 +126,24 @@ func findQuality(note1 string, note2 string) string {
 	}
 
 	if name1[:1] == name2[:1] && wrongQuality != "P" {
+		wrongQuality = "P"
+		delta = 0
 		if note1[1:2] == "#" {
 			delta -= 1
 		} else if note1[1:2] == "b" {
 			delta += 1
 		}
 		if note2[1:2] == "#" {
-			delta -= 1
-		} else if note2[1:2] == "b" {
 			delta += 1
+		} else if note2[1:2] == "b" {
+			delta -= 1
 		}
 	}
-
-	// if len(note1) > 1 {
-	// 	if note1[1:2] == "#" {
-	// 		delta -= 1
-	// 	} else if note1[1:2] == "b" {
-	// 		delta += 1
-	// 	}
-	// } else if len(note2) > 1 {
-	// 	if note2[1:2] == "#" {
-	// 		delta -= 1
-	// 	} else if note2[1:2] == "b" {
-	// 		delta += 1
-	// 	}
-	// }
 
 	if delta >= 12 || delta <= -12 {
 		delta = ((delta % 12) + 12) % 12
 	}
-	fmt.Println(intervalSize)
-	fmt.Println(soundsLike)
-	fmt.Println("meep")
-	fmt.Println(delta)
+
 	return fixQuality(intervalSize, wrongQuality, delta)
 }
 
@@ -163,7 +152,6 @@ func findQuality(note1 string, note2 string) string {
 // @param note2 the name of a note and the number of its octave
 // @return the quality of the interval between the two notes and the size (ie. d7, m2, M3, P5, A4, etc.)
 func findInterval(note1 string, note2 string) string {
-	fmt.Println(note1 + " " + note2)
 	if isFirstNoteHigher(note1, note2) {
 		return findQuality(note2, note1) + strconv.Itoa(findIntervalSize(note2, note1))
 	} else {
