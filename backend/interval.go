@@ -133,9 +133,9 @@ func findQuality(note1 string, note2 string) string {
 // @return the quality of the interval between the two notes and the size (ie. d7, m2, M3, P5, A4, etc.)
 func findInterval(note1 string, note2 string) string {
 	if isFirstNoteHigher(note1, note2) {
-		return findQuality(note2, note1) + strconv.Atoi(findIntervalSize(note2, note1))
+		return findQuality(note2, note1) + strconv.Itoa(findIntervalSize(note2, note1))
 	} else {
-		return findQuality(note1, note2) + strconv.Atoi(findIntervalSize(note1, note2))
+		return findQuality(note1, note2) + strconv.Itoa(findIntervalSize(note1, note2))
 	}
 }
 
@@ -149,10 +149,9 @@ func isFirstNoteHigher(note1 string, note2 string) bool {
 	name1 := note1[:len(note1)-1]
 	name2 := note2[:len(note2)-1]
 	// conditional: assumes that you are not comparing double sharps/flats or more...
-	return note1num > note2num || (semitones[name1[:2]] >= semitones[name2[:2]] && note1num == note2num)
+	return note1num > note2num || (semitones[name1] >= semitones[name2] && note1num == note2num)
 }
 
 func main() {
-	a := "bob3"
-	fmt.Println(a[:len(a)-1])
+	fmt.Println(isFirstNoteHigher("B2", "C3"))
 }
