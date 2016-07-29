@@ -50,11 +50,7 @@ def findQuality(note1, note2):
 	# what the interval sounds like regardless of its formal name
 	soundsLike = intervalMap[(semitones[note2[0]] - semitones[note1[0]]) % 12]
 	wrongQuality = soundsLike[0]
-	# weird edge case when the notes are B and F
-	if note1[0] == 'B' and note2[0] == 'F':
-		wrongQuality = 'd'
-	if note1[0] == 'F' and note2[0] == 'B':
-		wrongQuality = 'A'
+
 	delta = 0
 	if len(note1) > 1:
 		if note1[1] == '#':

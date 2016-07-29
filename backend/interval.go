@@ -74,14 +74,18 @@ func fixQuality(intervalSize int, wrongQuality string, delta int) string {
 		} else if wrongQuality == "m" {
 			wrongQuality = "d"
 		}
-		qualities := []string{"dd", "d", "m", "M", "A","AA",}
-		quality = string(qualities[indexInArray(qualities, wrongQuality) + delta])
+		qualities := []string{"dd", "d", "P", "A","AA",}
+		index := indexInArray(qualities, wrongQuality) + delta
+		fmt.Println(index)
+		quality = string(qualities[index])
 	default:
 		if wrongQuality == "P" {
 			wrongQuality = "M"
 		}
 		qualities := []string{"dd", "d", "m", "M", "A","AA"}
-		quality = string(qualities[indexInArray(qualities, wrongQuality) + delta])
+		index := indexInArray(qualities, wrongQuality) + delta
+		fmt.Println(index)
+		quality = string(qualities[index])
 	}
 	return quality
 }
@@ -96,13 +100,6 @@ func findQuality(note1 string, note2 string) string {
 	// what the interval sounds like regardless of its formal name
 	soundsLike := intervalMap[((semitones[note2[0:1]] - semitones[note1[0:1]] % 12) + 12) % 12]
 	wrongQuality := soundsLike[0:1]
-
-	// weird edge cases if notes are B or F
-	if note1[0:1] == "B" || note2[0:1] == "F" {
-		wrongQuality = "d"
-	} else if note1[0:1] == "F" || note2[0:1] == "B" {
-		wrongQuality = "A"
-	}
 
 	delta := 0
 
@@ -120,10 +117,12 @@ func findQuality(note1 string, note2 string) string {
 		}
 	}
 
-	if delta >= 12 || delta <= 12 {
+	if delta >= 12 || delta <= -12 {
 		delta = ((delta % 12) + 12) % 12
 	}
-
+	fmt.Println(intervalSize)
+	fmt.Println(wrongQuality)
+	fmt.Println(delta)
 	return fixQuality(intervalSize, wrongQuality, delta)
 }
 
@@ -132,6 +131,7 @@ func findQuality(note1 string, note2 string) string {
 // @param note2 the name of a note and the number of its octave
 // @return the quality of the interval between the two notes and the size (ie. d7, m2, M3, P5, A4, etc.)
 func findInterval(note1 string, note2 string) string {
+	fmt.Println(note1 + " " + note2)
 	if isFirstNoteHigher(note1, note2) {
 		return findQuality(note2, note1) + strconv.Itoa(findIntervalSize(note2, note1))
 	} else {
@@ -148,10 +148,17 @@ func isFirstNoteHigher(note1 string, note2 string) bool {
 	note2num, _ := strconv.Atoi(note2[len(note2)-1:len(note2)])
 	name1 := note1[:len(note1)-1]
 	name2 := note2[:len(note2)-1]
+	if len(name1) > 2 {
+		name1 = name1[:2]
+	}
+	if len(name2) > 2 {
+		name2 = name2[:2]
+	}
+
 	// conditional: assumes that you are not comparing double sharps/flats or more...
 	return note1num > note2num || (semitones[name1] >= semitones[name2] && note1num == note2num)
 }
 
 func main() {
-	fmt.Println(isFirstNoteHigher("B2", "C3"))
+	fmt.Println(findInterval("E2", "B3"))
 }
