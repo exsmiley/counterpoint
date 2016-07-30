@@ -249,7 +249,52 @@ func semitoneDistanceFromInterval(interval string) int {
 // @param up the direction of the letter name you want to switch
 // @return the note that is the enharmonic equivalent of this note
 func switchEnharmonic(note string, up int) string {
-    return "TODO"
+    names := []string {"C", "D", "E", "F", "G", "A", "B"}
+    noteIndex := 0
+
+    for i, name := range names {
+        if name == note[0:1] {
+            noteIndex = i
+        }
+    }
+
+    enharmonicIndex := (((noteIndex + up) % 7) + 7) % 7
+    otherNote := names[enharmonicIndex]
+
+    // use relative position to find the equivalent enharmonic name
+    position := semitones[note[0:1]]
+
+    // add sharps/flats
+    for i := range note {
+        if note[i:i+1] == "#" {
+            position += 1
+        } else if note[i:i+1] == "b" {
+            position -= 1
+        }
+    }
+
+    // deal with wrapping around in semitones
+    if (noteIndex + up != enharmonicIndex) && (noteIndex + up > 0) {
+        position -= 12
+    } else if (noteIndex + up != enharmonicIndex) && (noteIndex + up < 0) {
+        position += 12
+    }
+
+    otherNotePosition := semitones[otherNote]
+    change := position - otherNotePosition
+
+    // now add sharps and flats as need to otherNote
+    if change > 0 {
+        for i := 0; i < change; i++ {
+            otherNote += "#"
+        }
+    } else {
+        for i := 0; i < -change; i++ {
+            otherNote += "b"
+        }
+    }
+
+    return otherNote
 }
 
 // Finds the note above that is the given interval away

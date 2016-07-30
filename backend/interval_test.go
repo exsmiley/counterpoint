@@ -56,12 +56,12 @@ var intervalTests = []intervaltest {
 }
 
 func TestFindInterval(t *testing.T) {
-	for i, test := range intervalTests {
+	for _, test := range intervalTests {
 		notes := test.notes
 		interval := test.interval
 		answer := findInterval(notes[0], notes[1])
 		if interval != answer {
-			t.Error("findInterval Test", i, "For", notes, "expected", interval, "got", answer)
+			t.Error("For", notes, "expected", interval, "got", answer)
 		}
 	}
 }
@@ -102,12 +102,47 @@ var semitoneTests = []semitonetest {
 }
 
 func TestSemitoneDistanceFromInterval(t *testing.T) {
-	for i, test := range semitoneTests {
+	for _, test := range semitoneTests {
 		interval := test.interval
 		semitone := test.semitone
 		answer := semitoneDistanceFromInterval(interval)
 		if semitone != answer {
-			t.Error("semitoneDistanceFromInterval Test", i, "For", interval, "expected", semitone, "got", answer)
+			t.Error("For", interval, "expected", semitone, "got", answer)
 		}
 	}
 }
+
+type enharmonictest struct {
+	note string
+	change int
+	enharmonic string
+}
+
+
+var enharmonicTests = []enharmonictest {
+	{"Bb", -1, "A#"},
+	{"C", -1, "B#"},
+	{"C#", 1, "Db"},
+	{"B", 1, "Cb"},
+	{"E", 1, "Fb"},
+	{"F", -1, "E#"},
+	{"A#", 1, "Bb"},
+	{"G", -1, "F##"},
+}
+
+
+
+func TestSwitchEnharmonic(t *testing.T) {
+	for _, test := range enharmonicTests {
+		note := test.note
+		change := test.change
+		enharmonic := test.enharmonic
+		answer := switchEnharmonic(note, change)
+		if enharmonic != answer {
+			t.Error("For", note, change, "expected", enharmonic, "got", answer)
+		}
+	}
+}
+
+
+
