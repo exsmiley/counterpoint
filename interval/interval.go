@@ -166,8 +166,8 @@ func findQuality(note1 string, note2 string) string {
 // @param note1 the name of a note and the number of its octave
 // @param note2 the name of a note and the number of its octave
 // @return the quality of the interval between the two notes and the size (ie. d7, m2, M3, P5, A4, etc.)
-func findInterval(note1 string, note2 string) string {
-    if isFirstNoteHigher(note1, note2) {
+func FindInterval(note1 string, note2 string) string {
+    if IsFirstNoteHigher(note1, note2) {
         return findQuality(note2, note1) + strconv.Itoa(findIntervalSize(note2, note1))
     } else {
         return findQuality(note1, note2) + strconv.Itoa(findIntervalSize(note1, note2))
@@ -178,7 +178,7 @@ func findInterval(note1 string, note2 string) string {
 // @param note1 the name of a note and the number of its octave
 // @param note2 the name of a note and the number of its octave
 // @return true if the first note is higher, otherwise false
-func isFirstNoteHigher(note1 string, note2 string) bool {
+func IsFirstNoteHigher(note1 string, note2 string) bool {
     note1num, _ := strconv.Atoi(note1[len(note1)-1:len(note1)])
     note2num, _ := strconv.Atoi(note2[len(note2)-1:len(note2)])
     name1 := note1[:len(note1)-1]
@@ -247,7 +247,7 @@ func semitoneDistanceFromInterval(interval string) int {
 // @param note the name of a note
 // @param up the direction of the letter name you want to switch
 // @return the note that is the enharmonic equivalent of this note
-func switchEnharmonic(note string, up int) string {
+func SwitchEnharmonic(note string, up int) string {
     names := []string {"C", "D", "E", "F", "G", "A", "B"}
     noteIndex := 0
 
@@ -300,7 +300,7 @@ func switchEnharmonic(note string, up int) string {
 // @param note the name of a note and the number of its octave
 // @param interval the name of an interval (ie. d7, m2, M3, P5, A4, etc.) up to 8ths
 // @return the name of a note that is the specified interval away
-func findNoteFromInterval(note string, interval string) string {
+func FindNoteFromInterval(note string, interval string) string {
     distance := semitoneDistanceFromInterval(interval)
 
     initialPosition := semitones[note[0:1]]
@@ -324,14 +324,14 @@ func findNoteFromInterval(note string, interval string) string {
         otherNote += strconv.Itoa(oneHigher+1)
     }
 
-    otherInterval := findInterval(note, otherNote)
+    otherInterval := FindInterval(note, otherNote)
 
     // make sure that the note is the harmonic note that it is supposed to be
     intervalNum, _ := strconv.Atoi(interval[len(interval)-1:len(interval)])
     otherIntervalNum, _ := strconv.Atoi(otherInterval[len(otherInterval)-1:len(otherInterval)])
     enharmonicChange := intervalNum - otherIntervalNum
 
-    enharmonicName := switchEnharmonic(otherNote[:len(otherNote)-1], enharmonicChange)
+    enharmonicName := SwitchEnharmonic(otherNote[:len(otherNote)-1], enharmonicChange)
     pitchRange := otherNote[len(otherNote)-1:len(otherNote)]
 
     return enharmonicName + pitchRange

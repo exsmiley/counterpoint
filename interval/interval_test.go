@@ -59,7 +59,7 @@ func TestFindInterval(t *testing.T) {
 	for _, test := range intervalTests {
 		notes := test.notes
 		interval := test.interval
-		answer := findInterval(notes[0], notes[1])
+		answer := FindInterval(notes[0], notes[1])
 		if interval != answer {
 			t.Error("For", notes, "expected", interval, "got", answer)
 		}
@@ -134,7 +134,7 @@ func TestSwitchEnharmonic(t *testing.T) {
 		note := test.note
 		change := test.change
 		enharmonic := test.enharmonic
-		answer := switchEnharmonic(note, change)
+		answer := SwitchEnharmonic(note, change)
 		if enharmonic != answer {
 			t.Error("For", note, change, "expected", enharmonic, "got", answer)
 		}
@@ -162,7 +162,7 @@ func TestFindNoteFromInterval(t *testing.T) {
 		note := test.note
 		interval := test.interval
 		otherNote := test.otherNote
-		answer := findNoteFromInterval(note, interval)
+		answer := FindNoteFromInterval(note, interval)
 		if otherNote != answer {
 			t.Error("For", note, interval, "expected", otherNote, "got", answer)
 		}
