@@ -1,4 +1,4 @@
-package main
+package interval
 
 import (
 	"testing"
@@ -118,7 +118,6 @@ type enharmonictest struct {
 	enharmonic string
 }
 
-
 var enharmonicTests = []enharmonictest {
 	{"Bb", -1, "A#"},
 	{"C", -1, "B#"},
@@ -129,8 +128,6 @@ var enharmonicTests = []enharmonictest {
 	{"A#", 1, "Bb"},
 	{"G", -1, "F##"},
 }
-
-
 
 func TestSwitchEnharmonic(t *testing.T) {
 	for _, test := range enharmonicTests {
@@ -144,5 +141,30 @@ func TestSwitchEnharmonic(t *testing.T) {
 	}
 }
 
+type notefromintervaltest struct {
+	note string
+	interval string
+	otherNote string
+}
 
+var noteFromIntervalTests = []notefromintervaltest {
+	{"A3", "m2", "Bb3"},
+	{"A#2", "P4", "D#3"},
+	{"B1", "m2", "C2"},
+	{"E3", "m3", "G3"},
+	{"G#3", "P5", "D#4"},
+	{"G4", "m7", "F5"},
+	{"Bb3", "M6", "G4"},
+}
 
+func TestFindNoteFromInterval(t *testing.T) {
+	for _, test := range noteFromIntervalTests {
+		note := test.note
+		interval := test.interval
+		otherNote := test.otherNote
+		answer := findNoteFromInterval(note, interval)
+		if otherNote != answer {
+			t.Error("For", note, interval, "expected", otherNote, "got", answer)
+		}
+	}
+}

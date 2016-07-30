@@ -1,7 +1,6 @@
-package main
+package interval
 
 import (
-    "fmt"
     "strconv"
     "strings"
 )
@@ -302,10 +301,38 @@ func switchEnharmonic(note string, up int) string {
 // @param interval the name of an interval (ie. d7, m2, M3, P5, A4, etc.) up to 8ths
 // @return the name of a note that is the specified interval away
 func findNoteFromInterval(note string, interval string) string {
-    return "TODO"
-}
+    distance := semitoneDistanceFromInterval(interval)
 
-func main() {
-    a := "bob"
-    fmt.Println(strings.ContainsAny(a, "acc cccccb"))
+    initialPosition := semitones[note[0:1]]
+
+    // add sharps/flats
+    for i := range note {
+        if note[i:i+1] == "#" {
+            initialPosition += 1
+        } else if note[i:i+1] == "b" {
+            initialPosition -= 1
+        }
+    }
+
+    otherNotePosition := (((initialPosition + distance) % 12) + 12) % 12
+    otherNote := semitoneReversed[otherNotePosition]
+
+    if (initialPosition + distance) == otherNotePosition {
+        otherNote += note[len(note)-1:len(note)]
+    } else {
+        oneHigher, _ := strconv.Atoi(note[len(note)-1:len(note)])
+        otherNote += strconv.Itoa(oneHigher+1)
+    }
+
+    otherInterval := findInterval(note, otherNote)
+
+    // make sure that the note is the harmonic note that it is supposed to be
+    intervalNum, _ := strconv.Atoi(interval[len(interval)-1:len(interval)])
+    otherIntervalNum, _ := strconv.Atoi(otherInterval[len(otherInterval)-1:len(otherInterval)])
+    enharmonicChange := intervalNum - otherIntervalNum
+
+    enharmonicName := switchEnharmonic(otherNote[:len(otherNote)-1], enharmonicChange)
+    pitchRange := otherNote[len(otherNote)-1:len(otherNote)]
+
+    return enharmonicName + pitchRange
 }
