@@ -131,7 +131,7 @@ def semitoneDistanceFromInterval(interval):
 			distance = distanceBetweenIntervals['M' + interval[len(interval)-1]]
 			if interval.find('A') > -1:
 				return distance + len(interval) - 1 # scales with the number of augmenteds
-			# that means it's minor!
+			# that means it's major!
 			else:
 				return distance
 

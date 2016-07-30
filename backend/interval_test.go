@@ -9,7 +9,6 @@ type intervaltest struct {
 	interval string
 }
 
-
 var intervalTests = []intervaltest {
 	{[]string {"Eb3", "G3"}, "M3"},
 	{[]string {"C#4", "A4"}, "m6"},
@@ -57,12 +56,58 @@ var intervalTests = []intervaltest {
 }
 
 func TestFindInterval(t *testing.T) {
-	for _, test := range intervalTests {
+	for i, test := range intervalTests {
 		notes := test.notes
 		interval := test.interval
 		answer := findInterval(notes[0], notes[1])
 		if interval != answer {
-			t.Error("For", notes, "expected", interval, "got", answer)
+			t.Error("findInterval Test", i, "For", notes, "expected", interval, "got", answer)
+		}
+	}
+}
+
+type semitonetest struct {
+	interval string
+	semitone int
+}
+
+var semitoneTests = []semitonetest {
+	{"M7", 11},
+	{"M6", 9},
+	{"M3", 4},
+	{"M2", 2},
+	{"d4", 4},
+	{"d5", 6},
+	{"d2", 0},
+	{"d3", 2},
+	{"m7", 10},
+	{"A3", 5},
+	{"m6", 8},
+	{"A5", 8},
+	{"A4", 6},
+	{"m3", 3},
+	{"m2", 1},
+	{"A2", 3},
+	{"P1", 0},
+	{"A7", 12},
+	{"P4", 5},
+	{"P5", 7},
+	{"P8", 12},
+	{"dd3", 1},
+	{"dd2", -1},
+	{"dd4", 3},
+	{"AA5", 9},
+	{"AA3", 6},
+	{"AA2", 4},
+}
+
+func TestSemitoneDistanceFromInterval(t *testing.T) {
+	for i, test := range semitoneTests {
+		interval := test.interval
+		semitone := test.semitone
+		answer := semitoneDistanceFromInterval(interval)
+		if semitone != answer {
+			t.Error("semitoneDistanceFromInterval Test", i, "For", interval, "expected", semitone, "got", answer)
 		}
 	}
 }
