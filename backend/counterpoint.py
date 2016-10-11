@@ -23,9 +23,12 @@ def checkContrary(cf1, cf2, counter1, counter2):
 # @param counter:list<str> the counterpoint, a list of notes
 # @return (boolean, list<str) True if all of the rules are followed, incidents
 #   where the rules are broken
-def checkFirstSpeciesRules(cf, counter):
+def checkFirstSpeciesRules(cf, cp):
     errors = []
-    verticalIntervals = []
+    vertical_intervals = []
+
+    # TODO get rid of hacky quick fix
+    counter = [x[0] for x in cp]
 
     # check for crossing
     for i in range(len(cf)):
@@ -34,10 +37,10 @@ def checkFirstSpeciesRules(cf, counter):
 
     # fill out the vertical intervals
     for i in range(len(cf)):
-        verticalInterval = findInterval(cf[i], counter[i])
-        verticalIntervals.append(verticalInterval)
-        if verticalInterval in ["P4", "A4", "d5"] or verticalInterval[1] in ["2", "7"]:
-            errors.append("Vertical Interval of " + verticalInterval + " between " + cf[i] + " and " + counter[i] + " at position " + str(i))
+        vertical_interval = findInterval(cf[i], counter[i])
+        vertical_intervals.append(vertical_interval)
+        if vertical_interval in ["P4", "A4", "d5"] or vertical_interval[1] in ["2", "7"]:
+            errors.append("Vertical Interval of " + vertical_interval + " between " + cf[i] + " and " + counter[i] + " at position " + str(i))
 
     # fill out the horizontal intervals
     for i in range(len(counter)-1):
@@ -48,20 +51,20 @@ def checkFirstSpeciesRules(cf, counter):
     # check for direct/parallel intervals
     for i in range(len(counter)-1):
         contrary = checkContrary(cf[i], cf[i+1], counter[i], counter[i+1])
-        if not contrary and ((verticalIntervals[i] == "P5" and verticalIntervals[i+1] == "P5") or 
-        (verticalIntervals[i] == "P8" and verticalIntervals[i+1] == "P8") or 
-        (verticalIntervals[i] == "P1" and verticalIntervals[i+1] == "P1")):
-            errors.append("Parallel " + verticalIntervals[i+1][1] + "th at position " + str(i+1))
-        elif not contrary and verticalIntervals[i+1] in ["P5", "P8"]:
-            errors.append("Direct " + verticalIntervals[i+1][1] + "th at position " + str(i+1))
+        if not contrary and ((vertical_intervals[i] == "P5" and vertical_intervals[i+1] == "P5") or 
+        (vertical_intervals[i] == "P8" and vertical_intervals[i+1] == "P8") or 
+        (vertical_intervals[i] == "P1" and vertical_intervals[i+1] == "P1")):
+            errors.append("Parallel " + vertical_intervals[i+1][1] + "th at position " + str(i+1))
+        elif not contrary and vertical_intervals[i+1] in ["P5", "P8"]:
+            errors.append("Direct " + vertical_intervals[i+1][1] + "th at position " + str(i+1))
 
     # check start
-    if not verticalIntervals[0] in ["M3", "P1", "P5", "P8"]:
-        errors.append("Incorrect start of a " + verticalIntervals[0] + " at position 0")
+    if not vertical_intervals[0] in ["M3", "P1", "P5", "P8"]:
+        errors.append("Incorrect start of a " + vertical_intervals[0] + " at position 0")
 
     # check end
-    if not verticalIntervals[len(verticalIntervals)-1] in ["P1", "P8"]:
-        errors.append("Incorrect ending of a " + verticalIntervals[len(verticalIntervals)-1] + " at position " + str(len(counter)-1))
+    if not vertical_intervals[len(vertical_intervals)-1] in ["P1", "P8"]:
+        errors.append("Incorrect ending of a " + vertical_intervals[len(vertical_intervals)-1] + " at position " + str(len(counter)-1))
 
     correct = len(errors) == 0
     return correct, errors
@@ -82,6 +85,12 @@ class CounterpointSolver(object):
         else:
             self.cp = cp
 
+        # TODO actually find scale a legit way
+        tonic = cf[-1]
+        # put it up an octave
+        tonic = tonic[:-1] + str(int(tonic[-1]) + 1)
+        self.scale = majorScale(tonic)
+
     def next_possible_moves(self):
         """
         Gets all of the next possible moves that can be made for the next note
@@ -96,7 +105,7 @@ class CounterpointSolver(object):
 
         # gets all intermediate notes
         else:
-            previous_note = self.cp[-1]
+            previous_note = self.cp[-1][0]
             match_note = self.cf[len(self.cp)]
             return self._note_step(previous_note, match_note)
 
@@ -104,19 +113,39 @@ class CounterpointSolver(object):
         """
         @return list of all possible notes to be the first note
         """
-        pass
+        possible = []
+        for note in self.scale:
+            vertical_interval = findInterval(self.cf[0], note)
+
+            if vertical_interval in ["M3", "P1", "P5", "P8"]:
+                possible.append(note)
+        return possible
 
     def _last_note_moves(self):
         """
         @return list of all possible notes to be the final note
         """
-        pass
+        possible = []
+        for note in self.scale:
+            vertical_interval = findInterval(self.cf[-1], note)
+
+            if vertical_interval in ["P1", "P8"]:
+                possible.append(note)
+        return possible
 
     def _note_step(self, previous_note, match_note):
         """
         @param previous_note the last note that was matched
         """
-        pass
+        # TODO make work for every species
+        possible = []
+        for note in self.scale:
+            vertical_interval = findInterval(self.cf[-1], note)
+            previous_interval = findInterval(previous_note, note)
+
+            if vertical_interval in ["P1", "m3", "M3", "P5", "m6", "M6", "P8"] and previous_interval not in ["P1", 'A4', "d5"]:
+                possible.append(note)
+        return possible
 
     def is_complete(self):
         """
@@ -141,7 +170,9 @@ class CounterpointSolver(object):
         """
         Gives a score to determine how good the counterpoint is
         """
-        return 5 + len(checkFirstSpeciesRules(self.cf, self.cp)[1])
+        if not self.is_complete():
+            return -10
+        return 5 - len(checkFirstSpeciesRules(self.cf, self.cp)[1])
 
     def choose_next_note(self, note):
         """
@@ -159,7 +190,8 @@ if __name__ == '__main__':
 
     solver = CounterpointSolver(cf)
 
-    done = friendly_alpha_beta_search(solver, )
+    done = friendly_alpha_beta_search(solver)
+    print done.get_counterpoint()
 
 
 
