@@ -2,7 +2,9 @@ from interval import *
 from scale import *
 import random
 import math
-from alphabeta import friendly_alpha_beta_search
+import time
+
+counter = 0
 
 def checkContrary(cf1, cf2, counter1, counter2):
     """
@@ -24,6 +26,9 @@ def checkContrary(cf1, cf2, counter1, counter2):
 # @return (boolean, list<str) True if all of the rules are followed, incidents
 #   where the rules are broken
 def checkFirstSpeciesRules(cf, cp):
+    """
+    TODO make this an actual scoring mechanism
+    """
     errors = []
     vertical_intervals = []
 
@@ -70,7 +75,7 @@ def checkFirstSpeciesRules(cf, cp):
     return correct, errors
 
 
-class CounterpointSolver(object):
+class CounterpointState(object):
 
     def __init__(self, cf, species=1, cp=None):
         """
@@ -91,25 +96,28 @@ class CounterpointSolver(object):
         tonic = tonic[:-1] + str(int(tonic[-1]) + 1)
         self.scale = majorScale(tonic)
 
-    def next_possible_moves(self):
+    def next_possible_notes(self):
         """
         Gets all of the next possible moves that can be made for the next note
         """
         # gets the possibilities to be the first note
         if len(self.cp) == 0:
-            return self._first_note_moves()
+            possible = self._get_first_note_choices()
 
         # gets the possibilities to be the last note
         elif len(self.cp) == len(self.cf) - 1:
-            return self._last_note_moves()
+            possible = self._get_last_note_choices()
 
         # gets all intermediate notes
         else:
             previous_note = self.cp[-1][0]
             match_note = self.cf[len(self.cp)]
-            return self._note_step(previous_note, match_note)
+            possible = self._get_next_note_choices(previous_note, match_note)
+        # scramble possible notes in order to get different solutions on different runs
+        # TODO scramble
+        return possible
 
-    def _first_note_moves(self):
+    def _get_first_note_choices(self):
         """
         @return list of all possible notes to be the first note
         """
@@ -121,7 +129,7 @@ class CounterpointSolver(object):
                 possible.append(note)
         return possible
 
-    def _last_note_moves(self):
+    def _get_last_note_choices(self):
         """
         @return list of all possible notes to be the final note
         """
@@ -133,7 +141,7 @@ class CounterpointSolver(object):
                 possible.append(note)
         return possible
 
-    def _note_step(self, previous_note, match_note):
+    def _get_next_note_choices(self, previous_note, match_note):
         """
         @param previous_note the last note that was matched
         """
@@ -177,23 +185,78 @@ class CounterpointSolver(object):
     def choose_next_note(self, note):
         """
         TODO make work for more than just first species
-        @return new CounterpointSolver with the move made
+        @return new CounterpointState with the move made
         """
         new_cp = self.get_counterpoint()
         new_cp.append([note])
 
-        return CounterpointSolver(self.cf, self.species, new_cp)
+        return CounterpointState(self.cf, self.species, new_cp)
+
+
+class CounterPointSolver(object):
+
+    def __init__(self, cf, species=1):
+        self.base_state = CounterpointState(cf, species)
+
+        self.final_state = None
+
+    def _friendly_alpha_beta_search(self, threshold=50):
+        """
+        Helper function that runs a friendly version of Alpha-Beta Search
+        where the two people are "collaborating".
+        """
+        starting_score = 0
+        solution = self._helper(self.base_state, starting_score, threshold)
+        print "Final Score:", solution[0]
+        self.final_state = solution[1]
+
+    def _helper(self, state, score, threshold):
+        """
+        Alpha-Beta helper function: Return the minimax value of a particular state
+
+        TODO multi-threading to speed up answer
+        """
+        global counter
+        counter += 1
+        if state.is_complete():
+            return (state.evaluate(), state)
+
+        action = (score, None)
+
+        for note in state.next_possible_notes():
+            new_state = state.choose_next_note(note)
+            next_val = self._helper(new_state, score, threshold)
+            if next_val[0] > score:
+                score = next_val[0]
+                action = next_val
+                if score > threshold:
+                    return action
+
+        return action
+
+    def get_solution(self):
+        """
+        @return a solution to the cantus firmus
+        """
+        if self.final_state is None:
+            self._friendly_alpha_beta_search()
+
+        return self.final_state.get_counterpoint()
 
 
 if __name__ == '__main__':
     cf = ["C2", "D2", "E2", "A2", "F2", "E2", "F2", "D2", "D2", "C2"]
 
-    solver = CounterpointSolver(cf)
+    start = time.time()
 
-    done = friendly_alpha_beta_search(solver)
-    print done.get_counterpoint()
+    solver = CounterPointSolver(cf)
 
+    print cf
+    print solver.get_solution()
 
+    print "Explored", counter, "paths!"
+
+    print "Took", time.time() - start, "seconds!"
 
 
 
