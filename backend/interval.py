@@ -158,12 +158,22 @@ def enharmonicSwitch(note, up):
 	otherNote = names[(noteIndex + up) % 7]
 	# use relative positions to find the equivalent enharmonic name
 	position = semitones[note[0]]
+
+	# retain note number if passed in
+	num = ""
+
 	# add sharps/flats
 	for i in range(len(note)):
 		if note[i] == "#":
 			position += 1
 		elif note[i] == "b":
 			position -= 1
+		else:
+			try:
+				num += str(int(note[i]))
+			except:
+				pass
+
 	# deal with wrapping around in semitones
 	if noteIndex + up != (noteIndex + up) % 7 and (noteIndex + up) > 0:
 		position -= 12
@@ -179,7 +189,7 @@ def enharmonicSwitch(note, up):
 		for i in range(-change):
 			otherNote += "b"
 
-	return otherNote
+	return otherNote + num
 
 # Finds the note above that is the given interval away
 # @param note:str the name of a note and the number of its octave
