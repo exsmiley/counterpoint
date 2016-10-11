@@ -3,16 +3,7 @@ from scale import *
 import random
 import math
 
-# Checks if the notes in the cantus firmus and counterpoint move in contrary motion
-# @param cf1:str the base note of the cantus firmus
-# @param cf2:str the note of the cantus firmus moved into
-# @param counter1:str the base note of the counterpoint
-# @param counter2:str the note of the counterpoint moved into
-# @return True if the motion was in opposite directions
-def checkContrary(cf1, cf2, counter1, counter2):
-	cfup = isFirstNoteHigher(cf1, cf2)
-	counterup = isFirstNoteHigher(counter1, counter2)
-	return (cfup and not counterup) or (not cfup and counterup) # xor
+
 
 # Checks the rules of first species counterpoint, requires cf and counter to have the same length
 # @param cf:list<str> the cantus firmus, a list of notes
@@ -62,10 +53,7 @@ def checkFirstSpeciesRules(cf, counter):
 	correct = len(errors) == 0
 	return correct, errors
 
-# Creates a counterpoint according to the rules of First Species Counterpoint
-# @param cf:list<str> the cantus firmus, a list of notes
-# @param scale_type:str the type of scale that is to be used to make the counterpoint
-# @return list<str> a list of notes to satisfy counterpoint, otherwise None
+
 def findFirstSpecies(cf, scale_type="major"):
 	scale = majorScale(cf[len(cf)-1]) # get possible notes that can be used
 	possible = []
@@ -106,7 +94,8 @@ def findFirstSpecies(cf, scale_type="major"):
 	return counter
 
 
-
+def alpha_beta():
+	pass
 
 
 cf = ["C2", "D2", "E2", "A2", "F2", "E2", "F2", "D2", "D2", "C2"]
